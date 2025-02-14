@@ -215,6 +215,7 @@ class Pool extends EventEmitter {
   }
 
   newClient(pendingItem) {
+    const started = process.hrtime.bigint();
     const client = new this.Client(this.options)
     this._clients.push(client)
     const idleListener = makeIdleListener(this, client)
@@ -235,6 +236,7 @@ class Pool extends EventEmitter {
 
     this.log('connecting new client')
     client.connect((err) => {
+      this.emit("connect-time", Number(process.hrtime.bigint() - started), err);
       if (tid) {
         clearTimeout(tid)
       }
